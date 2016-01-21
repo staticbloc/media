@@ -1,0 +1,2 @@
+task deployRelease(dependsOn: [updateVersion, bintrayUpload])
+bintrayUpload.mustRunAfter updateVersion
