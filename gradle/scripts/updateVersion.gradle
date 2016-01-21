@@ -1,0 +1,130 @@
+import java.util.concurrent.CancellationException
+
+task updateVersion << {
+  String MAJOR = 'major'
+  String MINOR = 'minor'
+  String PATCH = 'patch'
+
+  Console console = System.console()
+  if(console == null) {
+    return
+  }
+
+  List<String> output = getProcessOutput('git', 'rev-parse', '--abbrev-ref', 'HEAD') as List<String>
+  if(!output) {
+    throw new IllegalStateException("There was an error checking the current branch")
+  }
+  else if(!'master'.equals(output.get(0))) {
+    throw new IllegalStateException("updateVersion can only be run while on the master branch (was ${output.get(0)})")
+  }
+
+  File propsFile = project.file('version.properties')
+  Properties versionProperties = new Properties()
+  InputStream is = propsFile.newDataInputStream();
+  try {
+    versionProperties.load(is)
+  }
+  finally {
+    is.close()
+  }
+
+  String originalVersionName = versionProperties.getProperty('VERSION_NAME')
+  if(!originalVersionName) {
+    throw new IllegalStateException('VERSION_NAME is not defined in version.properties')
+  }
+
+  console.println("Current version: ${originalVersionName}")
+
+  String method = console.readLine("\nHow would you like to increment the version for '${project.name}' (major, minor, patch)? ")
+  if(!MAJOR.equals(method) && !MINOR.equals(method) && !PATCH.equals(method)) {
+    throw new IllegalArgumentException("${method} is not a valid increment method")
+  }
+
+  String[] versionSplit = originalVersionName.split('\\.')
+  int index
+  if(MAJOR.equals(method)) {
+    index = 0
+  }
+  else if(MINOR.equals(method)) {
+    index = 1
+  }
+  else {
+    index = 2
+  }
+
+  int version = versionSplit[index].toInteger()
+  versionSplit[index] = (version + 1).toString()
+
+  String newVersionName = "${versionSplit.join('.')}"
+
+  String originalVersionCode = versionProperties.getProperty('VERSION_CODE')
+  if(!originalVersionCode) {
+    throw new IllegalStateException('VERSION_CODE is not defined in version.properties')
+  }
+
+  String newVersionCode = (originalVersionCode.toInteger() + 1).toString()
+
+  String confirmation = null
+  while(!newVersionName.equals(confirmation)) {
+    confirmation = console.readLine("\nPlease confirm by entering the new version (${newVersionName}), or enter cancel to cancel: ")
+    if('cancel'.equals(confirmation)) {
+      throw new CancellationException("updateVersion ${newVersionName} cancelled")
+    }
+  }
+
+  versionProperties.setProperty("VERSION_CODE", newVersionCode)
+  versionProperties.setProperty("VERSION_NAME", newVersionName)
+
+  DataOutputStream os = propsFile.newDataOutputStream()
+  try {
+    versionProperties.store(os, "This file is automatically managed; please do not modify")
+  }
+  finally {
+    os.close()
+  }
+
+  try {
+    if(!runProcess('git', 'add', propsFile.absolutePath)) {
+      throw new IllegalStateException("Could not run 'git add ${propsFile.absolutePath}'")
+    }
+
+    if(!runProcess('git', 'commit', '-m', "\"Release ${newVersionName} of ${project.name}\"")) {
+      // undo add
+      if(!runProcess('git', 'reset', propsFile.absolutePath)) {
+        System.out.println('Could not reset version.properties. Please do it manually.')
+      }
+      throw new IllegalStateException("Could not run 'git commit -m'")
+    }
+
+    if(!runProcess('git', 'push', 'origin', 'head')) {
+      // undo commit
+      if(!runProcess('git', 'reset', 'HEAD~1')) {
+        System.out.println('Could not roll back commit. Please do it manually.')
+      }
+      throw new IllegalStateException("Could not run 'git push origin head'")
+    }
+  }
+  catch(Exception e) {
+    versionProperties.setProperty('VERSION_CODE', originalVersionCode)
+    versionProperties.setProperty('VERSION_NAME', originalVersionName)
+
+    os = propsFile.newDataOutputStream()
+    try {
+      versionProperties.store(os, "This file is automatically managed; please do not modify")
+    }
+    finally {
+      os.close()
+    }
+
+    throw e;
+  }
+
+  if(!runProcess('git', 'tag', "${project.name}-${newVersionName}")) {
+    System.out.println("Couldn't tag updateVersion")
+  }
+  else {
+    if(!runProcess('git', 'push', 'origin', '--tags')) {
+      System.out.println("Couldn't push updateVersion tag")
+    }
+  }
+}
