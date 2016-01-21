@@ -1,0 +1,25 @@
+allprojects { project ->
+  beforeEvaluate {
+    mergeProperties(project, rootProject.file('bintray.properties'))
+    mergeProperties(project, project.file('version.properties'))
+  }
+}
+
+def mergeProperties(Project project, File propsFile) {
+  if(propsFile.exists()) {
+    logger.debug("Merging properties from ${propsFile.getAbsolutePath()} for project ${project.name}")
+
+    Properties properties = new Properties()
+    InputStream is = propsFile.newDataInputStream();
+    try {
+      properties.load(is)
+    }
+    finally {
+      is.close()
+    }
+
+    for(String key : properties.propertyNames()) {
+      project.ext.set(key, properties.getProperty(key))
+    }
+  }
+}

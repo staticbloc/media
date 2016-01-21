@@ -1,0 +1,103 @@
+task updateVersion(dependsOn: [clean, build]) {
+  String MAJOR = 'major'
+  String MINOR = 'minor'
+  String PATCH = 'patch'
+
+  Console console = System.console()
+  if(console == null) {
+    return
+  }
+
+//  List<String> output = getProcessOutput('git', 'rev-parse', '--abbrev-ref', 'HEAD') as List<String>
+//  if(!output) {
+//    throw new IllegalStateException("There was an error checking the current branch")
+//  }
+//  else if(!'master'.equals(output.get(0))) {
+//    throw new IllegalStateException("updateVersion can only be run while on the master branch (was ${output.get(0)})")
+//  }
+
+  File propsFile = project.file('version.properties')
+  Properties versionProperties = new Properties()
+  InputStream is = propsFile.newDataInputStream();
+  try {
+    versionProperties.load(is)
+  }
+  finally {
+    is.close()
+  }
+
+  String versionName = versionProperties.getProperty('VERSION_NAME')
+  if(!versionName) {
+    throw new IllegalStateException('VERSION_NAME is not defined in version.properties')
+  }
+
+  console.println("Current version: ${versionName}")
+
+  String method = console.readLine("\nHow would you like to increment the version for '${project.name}' (major, minor, patch)? ")
+  if(!MAJOR.equals(method) && !MINOR.equals(method) && !PATCH.equals(method)) {
+    throw new IllegalArgumentException("${method} is not a valid increment method")
+  }
+
+  String[] versionSplit = versionName.split('\\.')
+  int index
+  if(MAJOR.equals(method)) {
+    index = 0
+  }
+  else if(MINOR.equals(method)) {
+    index = 1
+  }
+  else {
+    index = 2
+  }
+
+  int version = versionSplit[index].toInteger()
+  versionSplit[index] = (version + 1).toString()
+
+  versionName = "${versionSplit.join('.')}"
+
+  String versionCode = versionProperties.getProperty('VERSION_CODE')
+  if(!versionCode) {
+    throw new IllegalStateException('VERSION_CODE is not defined in version.properties')
+  }
+
+  versionCode = (versionCode.toInteger() + 1).toString()
+
+  String confirmation = null
+  while(!versionName.equals(confirmation)) {
+    confirmation = console.readLine("\nPlease confirm by entering the new version (${versionName}), or enter cancel to cancel: ")
+    if('cancel'.equals(confirmation)) {
+      throw new StopActionException("updateVersion ${versionName} cancelled")
+    }
+  }
+
+  versionProperties.setProperty("VERSION_CODE", versionCode)
+  versionProperties.setProperty("VERSION_NAME", versionName)
+
+  DataOutputStream os = propsFile.newDataOutputStream()
+  try {
+    versionProperties.store(os, null)
+  }
+  finally {
+    os.close()
+  }
+
+  if(!runProcess('git', 'add', propsFile.absolutePath)) {
+    throw new IllegalStateException("Could not run 'git add ${propsFile.absolutePath}'")
+  }
+
+  if(!runProcess('git', 'commit', '-m', "\"Release ${versionName} of ${project.name}\"")) {
+    throw new IllegalStateException("Could not run 'git commit -m'")
+  }
+
+  if(!runProcess('git', 'push', 'origin', 'head')) {
+    throw new IllegalStateException("Could not run 'git push origin head'")
+  }
+
+  if(!runProcess('git', 'tag', versionName)) {
+    System.out.println("Couldn't tag updateVersion")
+  }
+
+  if(!runProcess('git', 'push', 'origin', '--tags')) {
+    System.out.println("Couldn't push updateVersion tag")
+  }
+}
