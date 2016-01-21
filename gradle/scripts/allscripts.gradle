@@ -1,0 +1,3 @@
+apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/run_process.gradle"
+apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/release.gradle"
+apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/deployRelease.gradle"
