@@ -1,13 +1,16 @@
 package com.staticbloc.media.app;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +27,12 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 public class MainFragment extends SimpleCameraFragment {
+  private static final int REQUEST_WRITE_EXTERNAL_PERMISSION = 3;
   private ImageView imageView;
   private View capturePhotoView;
   private ImageView toggleFlashTypeView;
+
+  private boolean writeExternalPermission;
 
   public MainFragment() {}
 
@@ -61,6 +67,54 @@ public class MainFragment extends SimpleCameraFragment {
             .build())
         .allowZooming(true)
         .build();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    writeExternalPermission = ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+
+    if(capturePhotoView != null) capturePhotoView.setEnabled(writeExternalPermission);
+
+    if(!writeExternalPermission) {
+      requestWriteExternalPermission();
+    }
+  }
+
+  private void requestWriteExternalPermission() {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+      onExplainWriteExternalPermission();
+    }
+    else {
+      ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_WRITE_EXTERNAL_PERMISSION);
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    switch(requestCode) {
+      case REQUEST_WRITE_EXTERNAL_PERMISSION:
+        writeExternalPermission = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+        if (!writeExternalPermission) {
+          onWriteExternalPermissionDenied();
+        }
+
+        if(capturePhotoView != null) capturePhotoView.setEnabled(writeExternalPermission);
+
+        break;
+      default:
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+  }
+
+  protected void onWriteExternalPermissionDenied() {
+    getActivity().finish();
+  }
+
+  protected void onExplainWriteExternalPermission() {
+    // TODO: use material dialog to explain and in the positive callback request permissions again
+    requestWriteExternalPermission();
   }
 
   @Override
