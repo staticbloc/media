@@ -47,6 +47,8 @@ public abstract class SimpleCameraFragment extends Fragment {
 
   private static final int NOT_SET = -1;
 
+  protected static final String CUSTOM_BUNDLE_KEY = "customBundle";
+
   private boolean allowZooming;
   private boolean mirrorFrontCameraImages;
   private boolean willRecordVideo;
@@ -688,6 +690,9 @@ public abstract class SimpleCameraFragment extends Fragment {
     args.putParcelable("maxPreviewSize", builder.maxPreviewSize);
     args.putParcelable("targetPhotoSize", builder.targetPhotoSize);
     args.putParcelable("targetVideoSize", builder.video.targetSize);
+    if(builder.customBundle != null) {
+      args.putBundle(CUSTOM_BUNDLE_KEY, builder.customBundle);
+    }
     setArguments(args);
   }
 
@@ -793,6 +798,8 @@ public abstract class SimpleCameraFragment extends Fragment {
 
     private Size maxPreviewSize = new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
     private Size targetPhotoSize = new Size(1920, 1080);
+
+    private Bundle customBundle = null;
 
     @NonNull
     public Builder<T> allowZooming(boolean allowZooming) {
@@ -908,6 +915,12 @@ public abstract class SimpleCameraFragment extends Fragment {
     @NonNull
     public Builder<T> targetPhotoSize(@NonNull Size targetPhotoSize) {
       this.targetPhotoSize = targetPhotoSize;
+      return this;
+    }
+
+    @NonNull
+    public Builder<T> customBundle(@NonNull Bundle customBundle) {
+      this.customBundle = customBundle;
       return this;
     }
 
