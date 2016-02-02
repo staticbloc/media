@@ -33,8 +33,8 @@ dependencies {
 }
 
 bintray {
-  user = project.property('BINTRAY_USER')
-  key = project.property('BINTRAY_KEY')
+  user = project.hasProperty('BINTRAY_USER') ? project.property('BINTRAY_USER') : ''
+  key = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : ''
   configurations = ['archives']
   publish = true
   pkg {
