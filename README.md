@@ -15,7 +15,7 @@ Download **camera** via Maven:
 
 or Gradle:
 ```groovy
-compile 'com.staticbloc.media:camera:0.0.1'
+compile 'com.staticbloc.media:camera:0.0.2'
 ```
 
 ## Simple Camera Fragment
@@ -30,5 +30,5 @@ Download **camera_fragment** via Maven:
 
 or Gradle:
 ```groovy
-compile 'com.staticbloc.media:camera_fragment:0.0.1'
+compile 'com.staticbloc.media:camera_fragment:0.0.2'
 ```
