@@ -24,7 +24,7 @@ dependencies {
 
   compile "com.android.support:appcompat-v7:${project.property("SUPPORT_LIB_VERSION")}"
   compile "com.android.support:design:${project.property("SUPPORT_LIB_VERSION")}"
-  compile 'com.staticbloc.media:camera_fragment:0.0.1'
+  compile 'com.staticbloc.media:camera_fragment:0.0.2'
 
   testCompile 'junit:junit:4.12'
 }
