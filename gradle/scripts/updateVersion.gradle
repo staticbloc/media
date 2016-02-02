@@ -88,7 +88,7 @@ task updateVersion << {
       throw new IllegalStateException("Could not run 'git add ${propsFile.absolutePath}'")
     }
 
-    if(!runProcess('git', 'commit', '-m', "\"Release ${newVersionName} of ${project.name}\"")) {
+    if(!runProcess('git', 'commit', '-m', "Release ${newVersionName} of ${project.name}")) {
       // undo add
       if(!runProcess('git', 'reset', propsFile.absolutePath)) {
         System.out.println('Could not reset version.properties. Please do it manually.')
