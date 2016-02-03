@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import com.staticbloc.media.utils.BitmapUtils;
 import com.staticbloc.media.utils.PhotoWriter;
@@ -32,12 +31,12 @@ public final class ImageCropper {
   }
 
   public interface OutputTransformer<T> {
-    T transformCroppedBitmap(Bitmap croppedBitmap);
+    @NonNull T transformCroppedBitmap(@NonNull Bitmap croppedBitmap);
   }
 
   public interface OnCropListener<I, O> {
-    void onCropSuccess(I input, O output);
-    void onCropFailure(Throwable e);
+    void onCropSuccess(@NonNull I input, @NonNull O output);
+    void onCropFailure(@NonNull Throwable e);
   }
 
   public ImageCropper(Executor executor, Handler handler) {
@@ -83,7 +82,7 @@ public final class ImageCropper {
   }
 
   @WorkerThread
-  @Nullable
+  @NonNull
   public final <I, O> O crop(final @NonNull I input, @NonNull InputFactory<I> inputFactory, @NonNull final OutputTransformer<O> outputTransformer) throws Throwable {
     if(rect == null) {
       throw new IllegalStateException("Cannot crop without a cropping rect");
@@ -169,15 +168,17 @@ public final class ImageCropper {
   }
 
   public static class BitmapOutput implements OutputTransformer<Bitmap> {
+    @NonNull
     @Override
-    public Bitmap transformCroppedBitmap(Bitmap croppedBitmap) {
+    public Bitmap transformCroppedBitmap(@NonNull Bitmap croppedBitmap) {
       return croppedBitmap;
     }
   }
 
   public static class ByteArrayOutput implements OutputTransformer<byte[]> {
+    @NonNull
     @Override
-    public byte[] transformCroppedBitmap(Bitmap croppedBitmap) {
+    public byte[] transformCroppedBitmap(@NonNull Bitmap croppedBitmap) {
       return BitmapUtils.bitmapToByteArray(croppedBitmap);
     }
   }
@@ -197,8 +198,9 @@ public final class ImageCropper {
       this.file = file;
     }
 
+    @NonNull
     @Override
-    public File transformCroppedBitmap(Bitmap croppedBitmap) {
+    public File transformCroppedBitmap(@NonNull Bitmap croppedBitmap) {
       return PhotoWriter.writePhotoToFile(croppedBitmap, compressQuality, compressFormat, file);
     }
   }

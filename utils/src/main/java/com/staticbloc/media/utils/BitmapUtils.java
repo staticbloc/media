@@ -1,11 +1,13 @@
 package com.staticbloc.media.utils;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
 import java.io.ByteArrayOutputStream;
 
 public class BitmapUtils {
-  public static byte[] bitmapToByteArray(Bitmap bitmap) {
+  @NonNull
+  public static byte[] bitmapToByteArray(@NonNull Bitmap bitmap) {
     ByteArrayOutputStream out = null;
     try {
       out = new ByteArrayOutputStream(bitmap.getWidth() * bitmap.getHeight());
