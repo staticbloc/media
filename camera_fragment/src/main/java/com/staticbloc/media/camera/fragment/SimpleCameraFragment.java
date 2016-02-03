@@ -337,6 +337,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     }
 
     camera = cameraBuilder.build();
+    //noinspection ResourceType
     camera.init(callbacks, allowedCameraType);
     cameraPreviewWrapper = CameraPreviewWrapper.newInstance(getContext(), previewType);
   }
