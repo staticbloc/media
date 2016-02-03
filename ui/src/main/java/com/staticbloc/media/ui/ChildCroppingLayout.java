@@ -2,27 +2,40 @@ package com.staticbloc.media.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 public class ChildCroppingLayout extends ViewGroup {
+  private Point displaySize;
+
   public ChildCroppingLayout(Context context) {
-    super(context);
+    this(context, null);
   }
 
   public ChildCroppingLayout(Context context, AttributeSet attrs) {
-    super(context, attrs);
+    this(context, attrs, 0);
   }
 
   public ChildCroppingLayout(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
+    init();
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   public ChildCroppingLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
     super(context, attrs, defStyleAttr, defStyleRes);
+    init();
+  }
+
+  private void init() {
+    final Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    displaySize = new Point();
+    display.getSize(displaySize);
   }
 
   @Override
@@ -58,9 +71,8 @@ public class ChildCroppingLayout extends ViewGroup {
     }
 
     if (child.getVisibility() != GONE) {
-      final ViewGroup parent = ((ViewGroup) getParent());
-      final int widthCroppingFactor = Math.round(parent.getMeasuredWidth() / ((float) getMeasuredWidth()));
-      final int heightCroppingFactor = Math.round(parent.getMeasuredHeight() / ((float) getMeasuredHeight()));
+      final int widthCroppingFactor = Math.round(displaySize.x / ((float) getMeasuredWidth()));
+      final int heightCroppingFactor = Math.round(displaySize.y / ((float) getMeasuredHeight()));
 
       if(widthCroppingFactor == 1 && heightCroppingFactor == 1) {
         child.layout(0, 0, child.getMeasuredWidth(), child.getMeasuredHeight());
