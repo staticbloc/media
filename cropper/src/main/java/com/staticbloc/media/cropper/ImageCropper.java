@@ -1,9 +1,11 @@
 package com.staticbloc.media.cropper;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -14,6 +16,7 @@ import com.staticbloc.media.utils.PhotoWriter;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.InputStream;
 import java.util.concurrent.Executor;
 
 public final class ImageCropper {
@@ -142,6 +145,26 @@ public final class ImageCropper {
     @NonNull @Override
     public BitmapRegionDecoder createBitmapRegionDecoder(@NonNull FileDescriptor input) throws Throwable {
       return BitmapRegionDecoder.newInstance(input, false);
+    }
+  }
+
+  public static class UriInput implements InputFactory<Uri> {
+    private final Context context;
+
+    public UriInput(Context context) {
+      this.context = context.getApplicationContext();
+    }
+
+    @NonNull @Override
+    public BitmapRegionDecoder createBitmapRegionDecoder(@NonNull Uri input) throws Throwable {
+      InputStream is = null;
+      try {
+        is = context.getContentResolver().openInputStream(input);
+        return BitmapRegionDecoder.newInstance(is, false);
+      }
+      finally {
+        try { if(is != null) is.close(); } catch(Exception ignore) {}
+      }
     }
   }
 
