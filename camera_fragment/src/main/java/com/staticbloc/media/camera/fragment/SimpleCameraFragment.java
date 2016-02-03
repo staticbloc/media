@@ -575,11 +575,11 @@ public abstract class SimpleCameraFragment extends Fragment {
               .shutterActionListener(shutterActionListener)
               .photoReadyListener(new PhotoCaptureRequest.PhotoCapturedListener<File>() {
                 @Override
-                public void onPhotoCaptured(@Nullable Throwable t, @NonNull File photo) {
-                  if (t == null) {
+                public void onPhotoCaptured(@Nullable Throwable t, @Nullable File photo) {
+                  if (photo != null) {
                     SimpleCameraFragment.this.onPhotoCaptured(photo);
                   }
-                  else {
+                  else if(t != null) {
                     onPhotoCaptureError(t);
                   }
                 }
