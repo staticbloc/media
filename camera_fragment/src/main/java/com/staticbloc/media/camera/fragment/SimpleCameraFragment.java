@@ -682,6 +682,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     args.putLong("maxRecordingSize", builder.video.maxRecordingSize);
     args.putInt("maxRecordingDuration", builder.video.maxRecordingDuration);
     args.putBoolean("videoCaptureSessionCancelledOnClose", builder.video.videoCaptureSessionCancelledOnClose);
+    args.putBoolean("longPressCaptureToRecordVideo", builder.video.longPressCaptureToRecordVideo);
     args.putInt("allowedCameraType", builder.allowedCameraType);
     args.putInt("initialCameraType", builder.initialCameraType);
     args.putStringArray("nonAllowedFlashModes", builder.nonAllowedFlashModes);
@@ -689,7 +690,6 @@ public abstract class SimpleCameraFragment extends Fragment {
     args.putInt("previewType", builder.previewType);
     args.putBoolean("useCroppingContainer", builder.useCroppingContainer);
     args.putParcelable("fileFactory", builder.fileFactory);
-    args.putBoolean("longPressCaptureToRecordVideo", builder.longPressCaptureToRecordVideo);
     args.putParcelable("maxPreviewSize", builder.maxPreviewSize);
     args.putParcelable("targetPhotoSize", builder.targetPhotoSize);
     args.putParcelable("targetVideoSize", builder.video.targetSize);
@@ -798,7 +798,6 @@ public abstract class SimpleCameraFragment extends Fragment {
     private int previewType = CameraPreviewWrapper.SURFACE_VIEW_PREVIEW;
     private boolean useCroppingContainer = false;
     private CameraFileFactory fileFactory = null;
-    private boolean longPressCaptureToRecordVideo = false;
 
     private Size maxPreviewSize = new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
     private Size targetPhotoSize = new Size(1920, 1080);
@@ -905,12 +904,6 @@ public abstract class SimpleCameraFragment extends Fragment {
     }
 
     @NonNull
-    public Builder<T> longPressCaptureToRecordVideo(boolean longPressCaptureToRecordVideo) {
-      this.longPressCaptureToRecordVideo = longPressCaptureToRecordVideo;
-      return this;
-    }
-
-    @NonNull
     public Builder<T> maxPreviewSize(@NonNull Size maxPreviewSize) {
       this.maxPreviewSize = maxPreviewSize;
       return this;
@@ -937,6 +930,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     private final long maxRecordingSize;
     private final int maxRecordingDuration;
     private final boolean videoCaptureSessionCancelledOnClose;
+    private boolean longPressCaptureToRecordVideo = false;
     private Size targetSize;
 
     private Video() {
@@ -956,6 +950,7 @@ public abstract class SimpleCameraFragment extends Fragment {
       private long maxRecordingSize = NOT_SET;
       private int maxRecordingDuration = NOT_SET;
       private boolean videoCaptureSessionCancelledOnClose = true;
+      private boolean longPressCaptureToRecordVideo = false;
       private Size targetSize = new Size(1920, 1080);
 
       @NonNull
@@ -987,6 +982,12 @@ public abstract class SimpleCameraFragment extends Fragment {
       @NonNull
       public Builder cancelVideoCaptureOnClose(boolean cancelVideoCaptureOnClose) {
         this.videoCaptureSessionCancelledOnClose = cancelVideoCaptureOnClose;
+        return this;
+      }
+
+      @NonNull
+      public Builder longPressCaptureToRecordVideo(boolean longPressCaptureToRecordVideo) {
+        this.longPressCaptureToRecordVideo = longPressCaptureToRecordVideo;
         return this;
       }
 
