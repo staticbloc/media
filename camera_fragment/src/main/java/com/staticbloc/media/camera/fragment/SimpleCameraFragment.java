@@ -608,8 +608,8 @@ public abstract class SimpleCameraFragment extends Fragment {
       videoCaptureSession = camera.startVideoRecording(new VideoCaptureRequest.Builder(getFileForVideo(), new VideoCaptureRequest.VideoCallbacks() {
         @Override
         public void onRecordingStarted() {
-          if(recordVideoView != null) recordVideoView.animate().alpha(0).start();
-          if(stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
+          if (recordVideoView != null) recordVideoView.animate().alpha(0).start();
+          if (stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
           captureGestureListener.recordingVideo = true;
 
           onVideoStartedRecording();
@@ -619,15 +619,15 @@ public abstract class SimpleCameraFragment extends Fragment {
         public void onVideoReady(@Nullable Throwable e, @Nullable File video, boolean autoStopped) {
           videoCaptureSession = null;
 
-          if(recordVideoView != null) recordVideoView.animate().alpha(0).start();
-          if(stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
+          if (recordVideoView != null) recordVideoView.animate().alpha(0).start();
+          if (stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
 
           captureGestureListener.recordingVideo = false;
 
-          if(e != null) {
+          if (e != null) {
             onVideoRecordingError(e);
           }
-          else if(video == null) {
+          else if (video == null) {
             onVideoRecordingCancelled();
           }
           else {
@@ -639,8 +639,8 @@ public abstract class SimpleCameraFragment extends Fragment {
         public void onCancelled() {
           videoCaptureSession = null;
 
-          if(recordVideoView != null) recordVideoView.animate().alpha(0).start();
-          if(stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
+          if (recordVideoView != null) recordVideoView.animate().alpha(0).start();
+          if (stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
 
           captureGestureListener.recordingVideo = false;
 
