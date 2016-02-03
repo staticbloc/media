@@ -199,8 +199,7 @@ public final class ImageCropper {
 
     @Override
     public File transformCroppedBitmap(Bitmap croppedBitmap) {
-      PhotoWriter.writePhotoToFile(croppedBitmap, compressQuality, compressFormat, file);
-      return null;
+      return PhotoWriter.writePhotoToFile(croppedBitmap, compressQuality, compressFormat, file);
     }
   }
 }
