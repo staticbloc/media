@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
@@ -36,9 +35,6 @@ import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public abstract class SimpleCameraFragment extends Fragment {
@@ -64,7 +60,7 @@ public abstract class SimpleCameraFragment extends Fragment {
   private CameraPreviewWrapper cameraPreviewWrapper;
   private FrameLayout previewContainerView;
 
-  private File outputDirectory;
+  private CameraFileFactory fileFactory;
 
   private CameraZoomTouchHandler zoomTouchHandler;
 
@@ -286,12 +282,9 @@ public abstract class SimpleCameraFragment extends Fragment {
     mockFrontFlash = args.getBoolean("mockFrontFlash");
     int previewType = args.getInt("previewType");
 
-    String outputDirectoryPath = args.getString("outputDirectory");
-    if(TextUtils.isEmpty(outputDirectoryPath)) {
-      outputDirectory = getContext().getFilesDir();
-    }
-    else {
-      outputDirectory = new File(outputDirectoryPath);
+    fileFactory = args.getParcelable("fileFactory");
+    if(fileFactory == null) {
+      fileFactory = new CameraFileFactory.Default(new File(getContext().getFilesDir(), "SimpleCameraFragment"));
     }
 
     longPressCaptureToRecordVideo = args.getBoolean("longPressCaptureToRecordVideo");
@@ -554,15 +547,13 @@ public abstract class SimpleCameraFragment extends Fragment {
   protected void animateCameraTypeToggle(ViewPropertyAnimator animator) {}
 
   @NonNull
-  private File getFileForPhoto() {
-    String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".jpg";
-    return new File(outputDirectory, fileName);
+  protected File getFileForPhoto() {
+    return fileFactory.getFileForPhoto();
   }
 
   @NonNull
-  private File getFileForVideo() {
-    String fileName = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".mp4";
-    return new File(outputDirectory, fileName);
+  protected File getFileForVideo() {
+    return fileFactory.getFileForVideo();
   }
 
   private void takePhoto() {
@@ -689,7 +680,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     args.putStringArray("nonAllowedFlashModes", builder.nonAllowedFlashModes);
     args.putBoolean("mockFrontFlash", builder.mockFrontFlash);
     args.putInt("previewType", builder.previewType);
-    args.putString("outputDirectory", builder.outputDirectory.getAbsolutePath());
+    args.putParcelable("fileFactory", builder.fileFactory);
     args.putBoolean("longPressCaptureToRecordVideo", builder.longPressCaptureToRecordVideo);
     args.putParcelable("maxPreviewSize", builder.maxPreviewSize);
     args.putParcelable("targetPhotoSize", builder.targetPhotoSize);
@@ -797,7 +788,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     private boolean mockFrontFlash = false;
     private String[] nonAllowedFlashModes = new String[0];
     private int previewType = CameraPreviewWrapper.SURFACE_VIEW_PREVIEW;
-    private File outputDirectory = null;
+    private CameraFileFactory fileFactory = null;
     private boolean longPressCaptureToRecordVideo = false;
 
     private Size maxPreviewSize = new Size(Integer.MAX_VALUE, Integer.MAX_VALUE);
@@ -893,14 +884,8 @@ public abstract class SimpleCameraFragment extends Fragment {
     }
 
     @NonNull
-    public Builder<T> outputDirectory(@NonNull String outputDirectory) {
-      this.outputDirectory = new File(outputDirectory);
-      return this;
-    }
-
-    @NonNull
-    public Builder<T> outputDirectory(@NonNull File outputDirectory) {
-      this.outputDirectory = outputDirectory;
+    public Builder<T> fileFactory(@NonNull CameraFileFactory fileFactory) {
+      this.fileFactory = fileFactory;
       return this;
     }
 
