@@ -509,6 +509,10 @@ public abstract class SimpleCameraFragment extends Fragment {
     this.toggleFlashTypeView = toggleFlashTypeView;
   }
 
+  protected final boolean hasError() {
+    return camera != null && camera.isError();
+  }
+
   protected final void requestCameraPermission() {
     if(!cameraPermission) {
       if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
