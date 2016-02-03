@@ -57,6 +57,7 @@ public abstract class SimpleCameraFragment extends Fragment {
   private boolean cameraPermission;
   private boolean videoPermission;
 
+  private boolean useCroppingContainer;
   private CameraPreviewWrapper cameraPreviewWrapper;
   private FrameLayout previewContainerView;
 
@@ -281,6 +282,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     }
     mockFrontFlash = args.getBoolean("mockFrontFlash");
     int previewType = args.getInt("previewType");
+    useCroppingContainer = args.getBoolean("useCroppingContainer");
 
     fileFactory = args.getParcelable("fileFactory");
     if(fileFactory == null) {
@@ -345,9 +347,6 @@ public abstract class SimpleCameraFragment extends Fragment {
   @Nullable
   @Override
   public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    ChildCroppingLayout childCroppingLayout = new ChildCroppingLayout(getContext());
-    childCroppingLayout.addView(cameraPreviewWrapper.getPreviewView());
-
     previewContainerView = new FrameLayout(getContext());
     previewContainerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -357,7 +356,14 @@ public abstract class SimpleCameraFragment extends Fragment {
       previewContainerView.addView(cameraOverlayView);
     }
 
-    previewContainerView.addView(childCroppingLayout, 0);
+    if(useCroppingContainer) {
+      ChildCroppingLayout childCroppingLayout = new ChildCroppingLayout(getContext());
+      childCroppingLayout.addView(cameraPreviewWrapper.getPreviewView());
+      previewContainerView.addView(childCroppingLayout, 0);
+    }
+    else {
+      previewContainerView.addView(cameraPreviewWrapper.getPreviewView(), 0);
+    }
 
     //noinspection ResourceType
     @Builder.ShutterAction int shutterAction = getArguments().getInt("shutterAction");
@@ -681,6 +687,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     args.putStringArray("nonAllowedFlashModes", builder.nonAllowedFlashModes);
     args.putBoolean("mockFrontFlash", builder.mockFrontFlash);
     args.putInt("previewType", builder.previewType);
+    args.putBoolean("useCroppingContainer", builder.useCroppingContainer);
     args.putParcelable("fileFactory", builder.fileFactory);
     args.putBoolean("longPressCaptureToRecordVideo", builder.longPressCaptureToRecordVideo);
     args.putParcelable("maxPreviewSize", builder.maxPreviewSize);
@@ -789,6 +796,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     private boolean mockFrontFlash = false;
     private String[] nonAllowedFlashModes = new String[0];
     private int previewType = CameraPreviewWrapper.SURFACE_VIEW_PREVIEW;
+    private boolean useCroppingContainer = false;
     private CameraFileFactory fileFactory = null;
     private boolean longPressCaptureToRecordVideo = false;
 
@@ -881,6 +889,12 @@ public abstract class SimpleCameraFragment extends Fragment {
     @NonNull
     public Builder<T> textureViewPreview() {
       this.previewType = CameraPreviewWrapper.TEXTURE_VIEW_PREVIEW;
+      return this;
+    }
+
+    @NonNull
+    public Builder<T> useCroppingContainer(boolean useCroppingContainer) {
+      this.useCroppingContainer = useCroppingContainer;
       return this;
     }
 
