@@ -11,6 +11,7 @@ import java.io.IOException;
 public class PhotoWriter {
   private PhotoWriter() {}
 
+  @NonNull
   public static File writePhotoToFile(@NonNull byte[] photo, @NonNull File file) {
     FileUtils.mkdirs(file);
 
@@ -27,10 +28,12 @@ public class PhotoWriter {
     }
   }
 
+  @NonNull
   public static File writePhotoToFile(@NonNull Bitmap photo, @NonNull File file) {
     return writePhotoToFile(photo, 100, Bitmap.CompressFormat.JPEG, file);
   }
 
+  @NonNull
   public static File writePhotoToFile(@NonNull Bitmap photo, @IntRange(from=1, to=100) int compressionQuality, Bitmap.CompressFormat compressionFormat, @NonNull File file) {
     FileUtils.mkdirs(file);
 
