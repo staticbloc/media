@@ -480,7 +480,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
 
     mediaRecorder.setPreviewDisplay(cameraPreview.getSurface());
 
-    MediaRecorderListener mediaRecorderListener = new MediaRecorderListener(this, videoCaptureSession, new Handler(Looper.myLooper()));
+    MediaRecorderListener mediaRecorderListener = new MediaRecorderListener(this, videoCaptureSession);
     mediaRecorder.setOnErrorListener(mediaRecorderListener);
     mediaRecorder.setOnInfoListener(mediaRecorderListener);
 
