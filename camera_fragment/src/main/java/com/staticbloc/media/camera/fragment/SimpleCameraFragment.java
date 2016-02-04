@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.GestureDetector;
-import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -761,7 +760,6 @@ public abstract class SimpleCameraFragment extends Fragment {
     @Override
     public void onLongPress(MotionEvent e) {
       if(videoCaptureEnabled) {
-        capturePhotoView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         startRecordingVideo();
       }
     }
