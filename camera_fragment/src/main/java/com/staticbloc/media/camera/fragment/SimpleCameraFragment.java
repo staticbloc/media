@@ -549,7 +549,7 @@ public abstract class SimpleCameraFragment extends Fragment {
   protected abstract void onVideoRecordingEnd(@Nullable Throwable t, @Nullable File video, boolean wasCancelled, boolean wasAutoStopped);
   protected abstract void onFlashModeChanged(@NonNull @SimpleCamera.FlashMode String flashMode, boolean isDefault);
 
-  protected void animateCameraTypeToggle(ViewPropertyAnimator animator) {}
+  protected void animatePreviewViewDuringCameraTypeToggle(@NonNull ViewPropertyAnimator animator) {}
 
   @NonNull
   protected File getFileForPhoto() {
@@ -716,7 +716,7 @@ public abstract class SimpleCameraFragment extends Fragment {
         }
 
         camera.toggleCameraType();
-        animateCameraTypeToggle(cameraPreviewWrapper.getPreviewView().animate());
+        animatePreviewViewDuringCameraTypeToggle(cameraPreviewWrapper.getPreviewView().animate());
       }
       else if(v == toggleFlashTypeView) {
         if(!cameraPermission) {
