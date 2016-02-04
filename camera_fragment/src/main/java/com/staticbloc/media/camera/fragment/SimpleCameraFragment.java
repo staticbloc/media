@@ -544,11 +544,9 @@ public abstract class SimpleCameraFragment extends Fragment {
   @Nullable protected abstract View onCreateCameraControlsView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
   protected abstract void onPhotoCaptured(@NonNull File photo);
   protected abstract void onPhotoCaptureError(@NonNull Throwable t);
-  protected abstract void onVideoStartedRecording();
+  protected abstract void onVideoRecordingStart();
   protected abstract void onVideoAlreadyRecording();
-  protected abstract void onVideoRecordingError(@NonNull Throwable t);
-  protected abstract void onVideoRecordingCancelled();
-  protected abstract void onVideoRecordingFinished(boolean autoStopped);
+  protected abstract void onVideoRecordingEnd(@Nullable Throwable t, @Nullable File video, boolean wasCancelled, boolean wasAutoStopped);
   protected abstract void onFlashModeChanged(@NonNull @SimpleCamera.FlashMode String flashMode, boolean isDefault);
 
   protected void animateCameraTypeToggle(ViewPropertyAnimator animator) {}
@@ -618,11 +616,11 @@ public abstract class SimpleCameraFragment extends Fragment {
           if (stopRecordingVideoView != null) stopRecordingVideoView.animate().alpha(1).start();
           captureGestureListener.recordingVideo = true;
 
-          onVideoStartedRecording();
+          onVideoRecordingStart();
         }
 
         @Override
-        public void onVideoReady(@Nullable Throwable e, @Nullable File video, boolean autoStopped) {
+        public void onVideoReady(@Nullable Throwable t, @Nullable File video, boolean autoStopped) {
           videoCaptureSession = null;
 
           if (recordVideoView != null) recordVideoView.animate().alpha(0).start();
@@ -630,14 +628,14 @@ public abstract class SimpleCameraFragment extends Fragment {
 
           captureGestureListener.recordingVideo = false;
 
-          if (e != null) {
-            onVideoRecordingError(e);
+          if (t != null) {
+            onVideoRecordingEnd(t, null, false, false);
           }
           else if (video == null) {
-            onVideoRecordingCancelled();
+            onVideoRecordingEnd(null, null, true, false);
           }
           else {
-            onVideoRecordingFinished(autoStopped);
+            onVideoRecordingEnd(null, video, false, autoStopped);
           }
         }
 
@@ -650,7 +648,7 @@ public abstract class SimpleCameraFragment extends Fragment {
 
           captureGestureListener.recordingVideo = false;
 
-          onVideoRecordingCancelled();
+          onVideoRecordingEnd(null, null, true, false);
         }
       }).build());
     }
