@@ -940,6 +940,7 @@ public abstract class SimpleCameraFragment extends Fragment {
       this.maxRecordingSize = builder.maxRecordingSize;
       this.maxRecordingDuration = builder.maxRecordingDuration;
       this.videoCaptureSessionCancelledOnClose = builder.videoCaptureSessionCancelledOnClose;
+      this.longPressCaptureToRecordVideo = builder.longPressCaptureToRecordVideo;
       this.targetSize = builder.targetSize;
     }
 
