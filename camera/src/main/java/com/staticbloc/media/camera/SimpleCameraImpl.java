@@ -459,72 +459,85 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
 
     if(callbacks != null) callbacks.onPhotoCaptureEnabledChanged(false);
 
-    // carefully following the steps in the order prescribed at https://developer.android.com/guide/topics/media/camera.html#capture-video
+    boolean error = false;
 
+    // carefully following the steps in the order prescribed at https://developer.android.com/guide/topics/media/camera.html#capture-video
     MediaRecorder mediaRecorder = new MediaRecorder();
 
-    camera.unlock();
-    mediaRecorder.setCamera(camera);
-
-    mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
-    mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-
-    mediaRecorder.setProfile(device.getCamcorderProfile());
-
-    if(videoBitrate != NOT_SET) mediaRecorder.setVideoEncodingBitRate(videoBitrate);
-    mediaRecorder.setMaxFileSize(maxRecordingSize);
-    mediaRecorder.setMaxDuration(maxRecordingDuration);
-
-    mediaRecorder.setOrientationHint(getCameraOrientation());
-
-    FileUtils.mkdirs(videoCaptureRequest.getFile());
-    mediaRecorder.setOutputFile(videoCaptureRequest.getFile().getAbsolutePath());
-
-    mediaRecorder.setPreviewDisplay(cameraPreview.getSurface());
-
-    MediaRecorderListener mediaRecorderListener = new MediaRecorderListener(this, videoCaptureSession);
-    mediaRecorder.setOnErrorListener(mediaRecorderListener);
-    mediaRecorder.setOnInfoListener(mediaRecorderListener);
-
-    boolean error = false;
-    videoCaptureSession.lock();
     try {
-      if(videoCaptureSession.isCancelled()) {
+      camera.unlock();
+      mediaRecorder.setCamera(camera);
+
+      mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+      mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+      mediaRecorder.setProfile(device.getCamcorderProfile());
+
+      if(videoBitrate != NOT_SET) mediaRecorder.setVideoEncodingBitRate(videoBitrate);
+      mediaRecorder.setMaxFileSize(maxRecordingSize);
+      mediaRecorder.setMaxDuration(maxRecordingDuration);
+
+      mediaRecorder.setOrientationHint(getCameraOrientation());
+
+      FileUtils.mkdirs(videoCaptureRequest.getFile());
+      mediaRecorder.setOutputFile(videoCaptureRequest.getFile().getAbsolutePath());
+
+      mediaRecorder.setPreviewDisplay(cameraPreview.getSurface());
+
+      MediaRecorderListener mediaRecorderListener = new MediaRecorderListener(this, videoCaptureSession);
+      mediaRecorder.setOnErrorListener(mediaRecorderListener);
+      mediaRecorder.setOnInfoListener(mediaRecorderListener);
+
+      videoCaptureSession.lock();
+      try {
+        if(videoCaptureSession.isCancelled()) {
+          mediaRecorder.reset();
+          mediaRecorder.release();
+          return videoCaptureSession;
+        }
+
+        mediaRecorder.prepare();
+
+        mediaRecorder.start();
+
+        videoCaptureSession.setRecordingObjects(mediaRecorder, videoCaptureRequest.getFile());
+        this.videoCaptureSession = videoCaptureSession;
+
+        callbackHandler.post(new Runnable() {
+          @Override
+          public void run() {
+            videoCaptureRequest.getVideoReadyListener().onRecordingStarted();
+          }
+        });
+      }
+      catch (IOException | IllegalStateException e) {
         mediaRecorder.reset();
         mediaRecorder.release();
-        return videoCaptureSession;
+
+        videoCaptureRequest.getFile().delete();
+
+        throw e;
       }
-
-      mediaRecorder.prepare();
-
-      mediaRecorder.start();
-
-      videoCaptureSession.setRecordingObjects(mediaRecorder, videoCaptureRequest.getFile());
-      this.videoCaptureSession = videoCaptureSession;
-
-      callbackHandler.post(new Runnable() {
-        @Override
-        public void run() {
-          videoCaptureRequest.getVideoReadyListener().onRecordingStarted();
-        }
-      });
+      finally {
+        videoCaptureSession.unlock();
+      }
     }
-    catch (IOException | IllegalStateException e) {
-      mediaRecorder.reset();
-      mediaRecorder.release();
-
-      videoCaptureRequest.getFile().delete();
-
+    catch(Throwable t) {
       setFocusForVideoOrPhoto(false);
 
       // TODO: try to figure out what went wrong, and explain it in the RuntimeException
-      videoCaptureSession.cancel(new RuntimeException("Exception while starting video recording", e));
+      videoCaptureSession.cancel(new RuntimeException("Exception while starting video recording", t));
 
       error = true;
     }
     finally {
-      videoCaptureSession.unlock();
-      camera.lock();
+      try {
+        camera.lock();
+      }
+      catch(Throwable t) {
+        Log.e("SimpleCamera", "Could not re-lock camera after error", t);
+      }
+
       if(error || device.isVideoSnapshotSupported()) {
         if(callbacks != null) callbacks.onPhotoCaptureEnabledChanged(true);
       }
