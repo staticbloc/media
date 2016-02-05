@@ -34,6 +34,19 @@ public class VideoCaptureSession {
     }
   };
 
+  private class ErrorCallbackRunnable implements Runnable {
+    private final Throwable t;
+
+    public ErrorCallbackRunnable(@NonNull Throwable t) {
+      this.t = t;
+    }
+
+    @Override
+    public void run() {
+      if(videoCallbacks != null) videoCallbacks.onVideoReady(t, null, false);
+    }
+  }
+
   /*package*/ void lock() {
     lock.lock();
   }
@@ -77,7 +90,12 @@ public class VideoCaptureSession {
           file.delete();
           file = null;
         }
-        if(callbackHandler != null) callbackHandler.post(callCancelCallback);
+
+        if(callbackHandler != null) {
+          if(throwable == null) callbackHandler.post(callCancelCallback);
+          else callbackHandler.post(new ErrorCallbackRunnable(throwable));
+        }
+
         mediaRecorder = null;
       }
       return notCanceledYet;

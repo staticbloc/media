@@ -15,6 +15,19 @@ public final class PhotoCaptureSession<T> extends CaptureSession<T> {
     }
   };
 
+  private class ErrorCallbackRunnable implements Runnable {
+    private final Throwable t;
+
+    public ErrorCallbackRunnable(@NonNull Throwable t) {
+      this.t = t;
+    }
+
+    @Override
+    public void run() {
+      if(photoCapturedListener != null) photoCapturedListener.onPhotoCaptured(t, null);
+    }
+  }
+
   /*package*/ synchronized void init(@Nullable  final PhotoCaptureRequest.PhotoCapturedListener<T> photoCapturedListener, @NonNull Handler callbackHandler) {
     this.photoCapturedListener = photoCapturedListener;
     this.callbackHandler = callbackHandler;
@@ -30,9 +43,12 @@ public final class PhotoCaptureSession<T> extends CaptureSession<T> {
   }
 
   @Override
-  synchronized boolean cancel(@Nullable Throwable throwable) {
+  /*package*/ synchronized boolean cancel(@Nullable Throwable throwable) {
     boolean notCanceledYet = throwable == null ? super.cancel() : super.cancel(throwable);
-    if(notCanceledYet && callbackHandler != null) callbackHandler.post(callCancelCallback);
+    if(notCanceledYet && callbackHandler != null) {
+      if(throwable == null) callbackHandler.post(callCancelCallback);
+      else callbackHandler.post(new ErrorCallbackRunnable(throwable));
+    }
     return notCanceledYet;
   }
 }
