@@ -15,6 +15,7 @@ import android.view.Display;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.WindowManager;
+import com.staticbloc.media.utils.FileUtils;
 import com.staticbloc.media.utils.Size;
 import com.staticbloc.media.utils.SizeUnit;
 
@@ -476,6 +477,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
 
     mediaRecorder.setOrientationHint(getCameraOrientation());
 
+    FileUtils.mkdirs(videoCaptureRequest.getFile());
     mediaRecorder.setOutputFile(videoCaptureRequest.getFile().getAbsolutePath());
 
     mediaRecorder.setPreviewDisplay(cameraPreview.getSurface());
