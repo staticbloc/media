@@ -50,7 +50,7 @@ public class VideoCaptureRequest {
 
   public interface VideoCallbacks {
     void onRecordingStarted();
-    void onVideoReady(@Nullable Throwable e, @Nullable File video, boolean autoStopped);
+    void onVideoReady(@Nullable Throwable t, @Nullable File video, boolean autoStopped);
     void onCancelled();
   }
 }

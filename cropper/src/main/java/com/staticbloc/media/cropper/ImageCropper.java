@@ -36,7 +36,7 @@ public final class ImageCropper {
 
   public interface OnCropListener<I, O> {
     void onCropSuccess(@NonNull I input, @NonNull O output);
-    void onCropFailure(@NonNull Throwable e);
+    void onCropFailure(@NonNull Throwable t);
   }
 
   public ImageCropper(Executor executor, Handler handler) {
