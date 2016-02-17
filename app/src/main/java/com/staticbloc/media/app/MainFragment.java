@@ -171,6 +171,8 @@ public class MainFragment extends SimpleCameraFragment {
         .alpha(1)
         .translationX(0)
         .translationY(0)
+        .scaleX(1)
+        .scaleY(1)
         .setListener(new AnimatorListenerAdapter() {
           @Override
           public void onAnimationEnd(Animator animation) {
@@ -181,6 +183,8 @@ public class MainFragment extends SimpleCameraFragment {
                     .alpha(0)
                     .translationX(imageView.getWidth())
                     .translationY(imageView.getHeight())
+                    .scaleX(0)
+                    .scaleY(0)
                     .setListener(null)
                     .start();
               }
