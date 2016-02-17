@@ -87,13 +87,12 @@ public abstract class PhotoCaptureRequest<T> {
     return photoCaptureSession;
   }
 
-  /*package*/ void onCapture(@NonNull byte[] data, @NonNull Handler callbackHandler, @NonNull SimpleCamera camera) {
+  /*package*/ void onCapture(@NonNull byte[] data, @NonNull Handler callbackHandler, @SimpleCamera.CameraType int cameraType) {
     if(photoCaptureSession.isCancelled()) return;
 
-    if(camera.getCameraType() != SimpleCamera.CAMERA_TYPE_FRONT) {
+    if(cameraType != SimpleCamera.CAMERA_TYPE_FRONT) {
       mirrorFrontCameraImage = false;
     }
-
 
     Bitmap photo = ByteArrayToBitmapTransformation.transform(data, mirrorFrontCameraImage);
 

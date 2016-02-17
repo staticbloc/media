@@ -760,6 +760,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
         }
       };
 
+      @CameraType final int cameraType = currentCameraType;
       Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(final byte[] data, Camera camera) {
@@ -790,7 +791,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
             photoCaptureSession.cancel();
           }
           else {
-            captureRequest.onCapture(data, callbackHandler, SimpleCameraImpl.this);
+            captureRequest.onCapture(data, callbackHandler, cameraType);
 
             if(captureRequest.shouldRestartPreview()) {
               setPreviewEnabled(true);
