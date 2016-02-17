@@ -63,7 +63,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
 
   private final CameraState state = new CameraState();
 
-  private volatile boolean previewEnabled;
+  private final AtomicBoolean previewEnabled = new AtomicBoolean();
 
   private int videoBitrate = NOT_SET;
   private long maxRecordingSize = NOT_SET;
@@ -213,7 +213,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
       return;
     }
 
-    if(previewEnabled) {
+    if(previewEnabled.get()) {
       setPreviewEnabled(false);
       if(this.cameraPreview != cameraPreview) {
         this.cameraPreview.release();
@@ -706,16 +706,15 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
       if(!state.compare(OPEN)) return;
 
       if(camera != null) {
-        if (enabled) {
+        boolean wasEnabled = previewEnabled.getAndSet(enabled);
+        if (enabled && !wasEnabled) {
           camera.startPreview();
-          previewEnabled = true;
 
           if(callbacks != null) callbacks.onPhotoCaptureEnabledChanged(true);
         }
-        else {
+        else if(!enabled && wasEnabled) {
           if(callbacks != null) callbacks.onPhotoCaptureEnabledChanged(false);
 
-          previewEnabled = false;
           camera.stopPreview();
         }
       }
@@ -724,7 +723,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
 
   @Override
   public boolean isPreviewEnabled() {
-    return previewEnabled;
+    return previewEnabled.get();
   }
 
   @NonNull
@@ -793,7 +792,10 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
           else {
             captureRequest.onCapture(data, callbackHandler, cameraType);
 
-            setPreviewEnabled(captureRequest.shouldRestartPreview());
+            boolean restartPreview = captureRequest.shouldRestartPreview();
+            // simulate the preview being in the opposite state of where we want it so that it will actually switch
+            previewEnabled.set(!restartPreview);
+            setPreviewEnabled(restartPreview);
           }
         }
       };
@@ -850,6 +852,8 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
     if(shutterSoundOverride != null) {
       shutterSoundOverride.close();
     }
+
+    previewEnabled.set(false);
 
     state.set(CLOSE);
 
