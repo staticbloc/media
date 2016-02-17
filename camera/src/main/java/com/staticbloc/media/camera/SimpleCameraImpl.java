@@ -793,9 +793,7 @@ import static com.staticbloc.media.camera.CameraState.RELEASE;
           else {
             captureRequest.onCapture(data, callbackHandler, cameraType);
 
-            if(captureRequest.shouldRestartPreview()) {
-              setPreviewEnabled(true);
-            }
+            setPreviewEnabled(captureRequest.shouldRestartPreview());
           }
         }
       };
