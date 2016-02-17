@@ -509,7 +509,27 @@ public abstract class SimpleCameraFragment extends Fragment {
   }
 
   protected final boolean hasError() {
-    return camera != null && camera.isError();
+    return camera.isError();
+  }
+
+  protected final boolean isOpened() {
+    return camera.isOpened();
+  }
+
+  protected final void setPreviewEnabled(boolean enabled) {
+    camera.setPreviewEnabled(enabled);
+  }
+
+  @SimpleCamera.FlashMode protected final String getFlashMode() {
+    return camera.getFlashMode();
+  }
+
+  protected final void setFlashMode(@SimpleCamera.FlashMode @NonNull String flashMode) {
+    camera.setFlashMode(flashMode);
+  }
+
+  @SimpleCamera.CameraType protected final int getCameraType() {
+    return camera.getCameraType();
   }
 
   protected final void requestCameraPermission() {
