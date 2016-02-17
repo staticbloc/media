@@ -111,9 +111,8 @@ public abstract class PhotoCaptureRequest<T> {
       value = onTransformed(photo);
 
       if(!photoCaptureSession.set(value)) {
-        if(value != null) {
-          onCancelled(value);
-        }
+        onCancelled(value);
+        value = null;
         return;
       }
     }
