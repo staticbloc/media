@@ -45,6 +45,7 @@ public abstract class SimpleCameraFragment extends Fragment {
   protected static final String CUSTOM_BUNDLE_KEY = "customBundle";
 
   private boolean allowZooming;
+  private boolean restartPreviewAfterTakingPhoto;
   private boolean mirrorFrontCameraImages;
   private boolean willRecordVideo;
   @SimpleCamera.AllowedCameraType private int allowedCameraType;
@@ -262,6 +263,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     }
 
     allowZooming = args.getBoolean("allowZooming");
+    restartPreviewAfterTakingPhoto = args.getBoolean("restartPreviewAfterTakingPhoto");
     mirrorFrontCameraImages = args.getBoolean("mirrorFrontCameraImages");
     boolean shutterSoundMute = args.getBoolean("shutterSoundMute");
     String shutterSoundOverridePath = args.getString("shutterSoundOverridePath");
@@ -593,7 +595,7 @@ public abstract class SimpleCameraFragment extends Fragment {
       }
 
       camera.takePhoto(PhotoCaptureRequest.asFile(getFileForPhoto())
-              .restartPreview(true)
+              .restartPreview(restartPreviewAfterTakingPhoto)
               .mirrorFrontCameraImage(mirrorFrontCameraImages)
               .shutterActionListener(shutterActionListener)
               .photoReadyListener(new PhotoCaptureRequest.PhotoCapturedListener<File>() {
@@ -689,6 +691,7 @@ public abstract class SimpleCameraFragment extends Fragment {
   private void populateArguments(Builder builder) {
     Bundle args = new Bundle();
     args.putBoolean("allowZooming", builder.allowZooming);
+    args.putBoolean("restartPreviewAfterTakingPhoto", builder.restartPreviewAfterTakingPhoto);
     args.putBoolean("mirrorFrontCameraImages", builder.mirrorFrontCameraImages);
     args.putInt("shutterAction", builder.shutterAction);
     args.putBoolean("shutterSoundMute", builder.shutterSoundMute);
@@ -800,6 +803,7 @@ public abstract class SimpleCameraFragment extends Fragment {
     /*package*/ static final int SHUTTER_ACTION_SCREEN_SHUTTER = 2;
 
     private boolean allowZooming = true;
+    private boolean restartPreviewAfterTakingPhoto = true;
     private boolean mirrorFrontCameraImages = true;
     @ShutterAction private int shutterAction = SHUTTER_ACTION_NONE;
     private boolean shutterSoundMute = false;
@@ -823,6 +827,12 @@ public abstract class SimpleCameraFragment extends Fragment {
     @NonNull
     public Builder<T> allowZooming(boolean allowZooming) {
       this.allowZooming = allowZooming;
+      return this;
+    }
+
+    @NonNull
+    public Builder<T> restartPreviewAfterTakingPhoto(boolean restartPreviewAfterTakingPhoto) {
+      this.restartPreviewAfterTakingPhoto = restartPreviewAfterTakingPhoto;
       return this;
     }
 

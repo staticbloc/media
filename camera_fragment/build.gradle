@@ -26,7 +26,7 @@ android {
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile "com.android.support:appcompat-v7:${project.property('SUPPORT_LIB_VERSION')}"
-  compile('com.staticbloc.media:camera:0.0.3@aar') {
+  compile('com.staticbloc.media:camera:0.0.4@aar') {
     transitive = true
   }
   testCompile 'junit:junit:4.12'
