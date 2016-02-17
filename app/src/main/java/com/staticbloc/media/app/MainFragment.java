@@ -19,6 +19,7 @@ import android.view.ViewPropertyAnimator;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.ImageView;
 import com.staticbloc.media.camera.SimpleCamera;
+import com.staticbloc.media.camera.fragment.CameraFileFactory;
 import com.staticbloc.media.camera.fragment.SimpleCameraFragment;
 import com.staticbloc.media.utils.Size;
 import com.staticbloc.media.utils.SizeUnit;
@@ -57,13 +58,13 @@ public class MainFragment extends SimpleCameraFragment {
         .nonAllowedFlashModes(SimpleCamera.FLASH_MODE_RED_EYE)
         .targetPhotoSize(new Size(1920, 1080))
         .withFlashScreenShutterAction()
-        .outputDirectory(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "SimpleCamera"))
-        .longPressCaptureToRecordVideo(true)
+        .fileFactory(new CameraFileFactory.Default(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "SimpleCamera")))
         .video(new Video.Builder()
             .bitrate(750, SizeUnit.KB)
             .maxRecordingDuration(10, TimeUnit.SECONDS)
             .targetSize(new Size(1920, 1080))
             .cancelVideoCaptureOnClose(true)
+            .longPressCaptureToRecordVideo(true)
             .build())
         .allowZooming(true)
         .build();
@@ -198,7 +199,7 @@ public class MainFragment extends SimpleCameraFragment {
   }
 
   @Override
-  protected void onVideoStartedRecording() {
+  protected void onVideoRecordingStart() {
     Snackbar.make(capturePhotoView, "Started recording video", Snackbar.LENGTH_LONG).show();
   }
 
@@ -208,23 +209,21 @@ public class MainFragment extends SimpleCameraFragment {
   }
 
   @Override
-  protected void onVideoRecordingError(@NonNull Throwable t) {
-    Snackbar.make(capturePhotoView, "There was an error while recording a video", Snackbar.LENGTH_LONG).show();
-    Log.e("SimpleCamera", "There was an error while recording a video", t);
-  }
-
-  @Override
-  protected void onVideoRecordingCancelled() {
-    Snackbar.make(capturePhotoView, "Video recording cancelled", Snackbar.LENGTH_LONG).show();
-  }
-
-  @Override
-  protected void onVideoRecordingFinished(boolean autoStopped) {
-    if(autoStopped) {
-      Snackbar.make(capturePhotoView, "Recorded video for max duration", Snackbar.LENGTH_LONG).show();
+  protected  void onVideoRecordingEnd(@Nullable Throwable t, @Nullable File video, boolean wasCancelled, boolean wasAutoStopped) {
+    if(t != null) {
+      Snackbar.make(capturePhotoView, "There was an error while recording a video", Snackbar.LENGTH_LONG).show();
+      Log.e("SimpleCamera", "There was an error while recording a video", t);
+    }
+    else if(wasCancelled) {
+      Snackbar.make(capturePhotoView, "Video recording cancelled", Snackbar.LENGTH_LONG).show();
     }
     else {
-      Snackbar.make(capturePhotoView, "Stopped recording video", Snackbar.LENGTH_LONG).show();
+      if(wasAutoStopped) {
+        Snackbar.make(capturePhotoView, "Recorded video for max duration", Snackbar.LENGTH_LONG).show();
+      }
+      else {
+        Snackbar.make(capturePhotoView, "Stopped recording video", Snackbar.LENGTH_LONG).show();
+      }
     }
   }
 
@@ -247,7 +246,7 @@ public class MainFragment extends SimpleCameraFragment {
   }
 
   @Override
-  protected void animateCameraTypeToggle(ViewPropertyAnimator animator) {
+  protected void animatePreviewViewDuringCameraTypeToggle(@NonNull ViewPropertyAnimator animator) {
     animator.rotationYBy(360)
         .setDuration(1500)
         .setInterpolator(new AnticipateOvershootInterpolator())
