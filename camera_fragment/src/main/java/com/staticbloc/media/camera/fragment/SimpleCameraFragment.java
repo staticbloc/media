@@ -530,6 +530,10 @@ public abstract class SimpleCameraFragment extends Fragment {
     camera.setFlashMode(flashMode);
   }
 
+  protected final boolean isFlashModeSupported(@SimpleCamera.FlashMode @NonNull String flashMode) {
+    return camera.getSupportedFlashModes().contains(flashMode);
+  }
+
   @SimpleCamera.CameraType protected final int getCameraType() {
     return camera.getCameraType();
   }
