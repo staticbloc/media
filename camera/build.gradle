@@ -25,7 +25,7 @@ android {
 
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
-  compile 'com.drewnoakes:metadata-extractor:2.8.1'
+  compile 'com.drewnoakes:metadata-extractor:2.9.1'
   compile('com.staticbloc.media:ui:0.0.4@aar') {
     transitive = true
   }
