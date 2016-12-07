@@ -1,1 +1,1 @@
-include ':app', ':camera', ':utils', ':ui', ':camera_fragment', ':cropper'
+include ':app', ':camera', ':utils', ':ui', ':camera_fragment'

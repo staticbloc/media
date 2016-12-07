@@ -2,11 +2,10 @@ set -e
 
 while true; do
     echo "Please select the project you would like to deploy"
-    select project in "camera" "camera_fragment" "cropper" "ui" "utils" "exit"; do
+    select project in "camera" "camera_fragment" "ui" "utils" "exit"; do
         case $project in
             camera ) ./gradlew camera:updateVersion; ./gradlew camera:clean camera:build camera:bintrayUpload; break;;
             camera_fragment ) ./gradlew camera_fragment:updateVersion; ./gradlew camera_fragment:clean camera_fragment:build camera_fragment:bintrayUpload; break;;
-            cropper ) ./gradlew cropper:updateVersion; ./gradlew cropper:clean cropper:build cropper:bintrayUpload; break;;
             ui ) ./gradlew ui:updateVersion; ./gradlew ui:clean ui:build ui:bintrayUpload; break;;
             utils ) ./gradlew utils:updateVersion; ./gradlew utils:clean utils:build utils:bintrayUpload; break;;
             exit ) exit;;
