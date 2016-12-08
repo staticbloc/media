@@ -1,2 +1,0 @@
-apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/run_process.gradle"
-apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/updateVersion.gradle"

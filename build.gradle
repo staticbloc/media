@@ -8,6 +8,7 @@ buildscript {
     classpath 'com.android.tools.build:gradle:2.2.2'
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.2'
     classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.10'
 
     // NOTE: Do not place your application dependencies here; they belong
     // in the individual module build.gradle files
@@ -19,6 +20,7 @@ allprojects {
     jcenter()
   }
 }
+
 ext {
   buildToolsVersion = '25.0.1'
   compileSdk = 25
@@ -31,5 +33,3 @@ ext {
 task clean(type: Delete) {
   delete rootProject.buildDir
 }
-
-apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/merge_properties.gradle"

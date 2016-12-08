@@ -1,9 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-
-version = project.property('VERSION_NAME') as String
-group = 'com.staticbloc.media'
 
 android {
   compileSdkVersion rootProject.compileSdk
@@ -30,74 +25,4 @@ dependencies {
   testCompile 'junit:junit:4.12'
 }
 
-bintray {
-  user = project.hasProperty('BINTRAY_USER') ? project.property('BINTRAY_USER') : ''
-  key = project.hasProperty('BINTRAY_KEY') ? project.property('BINTRAY_KEY') : ''
-  configurations = ['archives']
-  publish = true
-  pkg {
-    repo = 'media'
-    name = 'ui'
-    userOrg = 'staticbloc'
-    licenses = ['MIT']
-    vcsUrl = 'https://github.com/staticbloc/media.git'
-    publicDownloadNumbers = true
-    version {
-      name = project.property('VERSION_NAME')
-      released  = new Date()
-      vcsTag = project.property('VERSION_NAME')
-    }
-  }
-}
-
-install {
-  repositories.mavenInstaller {
-    pom {
-      project {
-        packaging 'aar'
-
-        name 'UI'
-        description 'Media UI'
-        url 'https://github.com/staticbloc/media/ui'
-        inceptionYear '2016'
-
-        licenses {
-          license {
-            name 'The MIT License (MIT)'
-          }
-        }
-        developers {
-          developer {
-            id 'eygraber'
-            name 'Eliezer Graber'
-          }
-        }
-        scm {
-          connection 'https://github.com/staticbloc/media.git'
-          url 'https://github.com/staticbloc/media/ui'
-        }
-      }
-    }
-  }
-}
-
-task sourcesJar(type: Jar) {
-  from android.sourceSets.main.java.srcDirs
-  classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-  source = android.sourceSets.main.java.srcDirs
-  classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-artifacts {
-  archives javadocJar
-  archives sourcesJar
-}
-
-apply from: "${rootDir.getAbsolutePath()}/gradle/scripts/allscripts.gradle"
+apply from: "https://raw.githubusercontent.com/eygraber/bintray-gradle-scripts/master/bintray.gradle"

@@ -1,0 +1,3 @@
+if(!project.hasProperty('BINTRAY_PACKAGE')) project.ext.BINTRAY_PACKAGE = 'utils'
+if(!project.hasProperty('ARTIFACT_NAME')) project.ext.ARTIFACT_NAME = 'utils'
+if(!project.hasProperty('DESCRIPTION')) project.ext.DESCRIPTION = 'Media utilities'

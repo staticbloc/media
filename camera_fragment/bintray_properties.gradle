@@ -1,0 +1,3 @@
+if(!project.hasProperty('BINTRAY_PACKAGE')) project.ext.BINTRAY_PACKAGE = 'simple_camera_fragment'
+if(!project.hasProperty('ARTIFACT_NAME')) project.ext.ARTIFACT_NAME = 'camera_fragment'
+if(!project.hasProperty('DESCRIPTION')) project.ext.DESCRIPTION = 'A Fragment that provides easy access to camera functionality'

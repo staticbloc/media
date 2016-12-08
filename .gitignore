@@ -9,7 +9,7 @@ app/build
 library/build
 .gradle
 local.properties
-bintray.properties
+bintray_local_properties.gradle
 *~
 tmp
 captures
