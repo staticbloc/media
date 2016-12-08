@@ -59,6 +59,7 @@ public abstract class SimpleCameraFragment extends Fragment {
 
   private boolean useCroppingContainer;
   private CameraPreviewWrapper cameraPreviewWrapper;
+  private View cameraPreviewView;
   private FrameLayout previewContainerView;
 
   private CameraFileFactory fileFactory;
@@ -96,10 +97,14 @@ public abstract class SimpleCameraFragment extends Fragment {
       cameraPreviewWrapper.setPreviewViewAspectRatio(camera.getPreviewSize());
 
       if(allowZooming) {
-        final View cameraPreviewView = cameraPreviewWrapper.getPreviewView();
+        cameraPreviewView = cameraPreviewWrapper.getPreviewView();
         cameraPreviewView.post(new Runnable() {
           @Override
           public void run() {
+            if(!camera.isOpened()) {
+              return;
+            }
+
             zoomTouchHandler = new CameraZoomTouchHandler(camera, cameraPreviewView.getMeasuredHeight() / 4, new CameraZoomTouchHandler.OnNewZoomValueListener() {
               @Override
               public void onZoomingStarted() {
@@ -237,11 +242,9 @@ public abstract class SimpleCameraFragment extends Fragment {
       if(toggleFlashTypeView != null) toggleFlashTypeView.setOnClickListener(null);
       if(toggleCameraTypeView != null) toggleCameraTypeView.setOnClickListener(null);
 
-      if(cameraPreviewWrapper != null) {
-        View cameraPreviewView = cameraPreviewWrapper.getPreviewView();
-        if(cameraPreviewView != null) {
-          cameraPreviewView.setOnTouchListener(null);
-        }
+      if(cameraPreviewView != null) {
+        cameraPreviewView.setOnTouchListener(null);
+        cameraPreviewView = null;
       }
     }
   };
